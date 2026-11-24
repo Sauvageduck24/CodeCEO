@@ -44,7 +44,7 @@ function backgroundSync() {
 try {
   if (event === 'session-start') {
     if (!active) {
-      emit({ hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext: 'CodeCEO plugin is installed but this project is not initialised. If the user wants module-scoped agents with persistent context, suggest `/codeceo:init`.' } });
+      emit({ hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext: 'CodeCEO plugin is installed but this project is not started. If the user wants module-scoped agents with persistent context, suggest `/codeceo:start` (one command; after it, ordinary messages are routed automatically).' } });
     } else {
       await core.syncIfChanged(root).catch(() => {});
       const s = core.status(root);
@@ -55,10 +55,12 @@ try {
       const lines = [
         `CodeCEO is active in this project: ${s.agents.length} agent(s), organisation restored from .codeceo/.`,
         top.length ? `Top-level zones: ${top.map((a) => `${a.id} (${a.paths[0]})`).join(', ')}.` : 'Single-agent project (small enough for one zone).',
-        unwritten ? `${unwritten} zone context(s) still empty — /codeceo:init fills them.` : '',
+        unwritten ? `${unwritten} zone context(s) still empty — /codeceo:start fills them.` : '',
         stale ? `${stale} zone context(s) are stale relative to the code.` : '',
         mail ? `${mail} open inter-agent message(s) — see /codeceo:status.` : '',
-        'For questions about the code or changes to it, use /codeceo:ask or /codeceo:change (or the codeceo:work skill) instead of reading the whole repo yourself: they route to the owning zone agents and keep your context small.',
+        core.loadConfig(root).auto !== false
+          ? 'CodeCEO mode is ON: the user just talks normally; every message about the code is routed to the owning zone agents (a per-message hint tells you how). The user can pause it with /codeceo:stop.'
+          : 'CodeCEO mode is OFF (paused). Work normally; /codeceo:ask, /codeceo:change and /codeceo:start are still available.',
       ].filter(Boolean);
       emit({ hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext: lines.join('\n') } });
     }
@@ -97,6 +99,19 @@ try {
       writeJson(claimsFile(), c);
     }
     backgroundSync();
+  } else if (event === 'user-prompt' && active && core.loadConfig(root).auto !== false) {
+    // CodeCEO mode: every ordinary message is handled by the zone agents, with no command to type.
+    const prompt = String(input.prompt ?? '').trim();
+    if (prompt && !prompt.startsWith('/')) {
+      const S = core.load(root);
+      const route = prompt.split(/\s+/).length >= 3 ? core.route(root, S.org, prompt) : null;
+      const lines = [
+        '[CodeCEO mode ON] This project is run by CodeCEO. If the message asks about or changes this codebase, handle it by invoking the `codeceo:work` skill: it routes the request to the zone agents that own the code. Do not read the repository yourself first.',
+        'Do NOT use CodeCEO for: requests unrelated to the code (chit-chat, general knowledge, questions about Claude or its tools), follow-ups to a flow already in progress, or when the user asks to work without CodeCEO.',
+        route && `Pre-computed route (use it, skip the route step): intent=${route.intent}, complexity=${route.complexity}, zones=[${route.agents.map((a) => a.id).join(', ')}], waves=${JSON.stringify(route.waves)}${route.review ? ', integration review needed' : ''}.`,
+      ].filter(Boolean);
+      emit({ hookSpecificOutput: { hookEventName: 'UserPromptSubmit', additionalContext: lines.join('\n') } });
+    }
   } else if (event === 'stop' && active) {
     backgroundSync();
   }

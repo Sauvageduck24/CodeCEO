@@ -42,6 +42,7 @@ const HELP = `CodeCEO ${VERSION} — a hierarchy of module-scoped agents with pe
     init                         Adopt this project: scan, build the org, write a context file per zone
     sync [--embed]               Re-scan; re-organise; refresh facts, indexes and contract checks
     status                       Org chart, stale contexts, open messages
+    mode on|off|status           CodeCEO mode: route every ordinary message through the zone agents
 
   Work
     route "<request>"            Which agents should handle this, in what order
@@ -112,6 +113,18 @@ async function main() {
       const s = core.status(root);
       const pending = s.agents.filter((a) => !a.written).length;
       return out({ ...r, pendingContexts: pending }, `CodeCEO initialised in ${root}\n  ${r.files} files · ${r.edges} dependencies · ${r.agents} agent(s)\n\n${tree(s)}\n\nContext files written to .codeceo/contexts/ (${pending} still need their Purpose filled by the owning agent).\nCommit the .codeceo/ folder to keep this organisation across chats and machines.`);
+    }
+    case 'mode': {
+      needInit();
+      const [sub = 'status'] = rest;
+      const file = storePath(root, 'config.json');
+      const cfg = readJson(file, { version: 1 });
+      if (sub === 'on' || sub === 'off') {
+        cfg.auto = sub === 'on';
+        fs.writeFileSync(file, JSON.stringify(cfg, null, 2) + '\n');
+      } else if (sub !== 'status') die('usage: codeceo mode on|off|status');
+      const on = core.loadConfig(root).auto !== false;
+      return out({ auto: on }, on ? 'CodeCEO mode is ON: every ordinary message is routed to the zone agents.' : 'CodeCEO mode is OFF: Claude works normally; /codeceo:ask and /codeceo:change still work.');
     }
     case 'sync': {
       needInit();

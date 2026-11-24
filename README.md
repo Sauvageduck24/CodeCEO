@@ -62,18 +62,27 @@ Requires Node.js 18+ (no `npm install`, no dependencies).
 
 ## Use
 
-Open any existing project and run:
-
 ```text
-/codeceo:init                          adopt the project, write one context file per zone
-/codeceo:ask  how does checkout apply discounts?
-/codeceo:change  make invoices round half-up
-/codeceo:status                        org chart, stale zones, open messages
-/codeceo:org  billing may not talk to catalog directly
+/codeceo:start
 ```
 
-You can also just talk normally: once a project is initialised, Claude is told to route questions and
-changes through the zone agents instead of reading the repo itself.
+That is the only command you need. It adopts the project (one context file per zone) and turns
+**CodeCEO mode** on. From then on you just talk, exactly as with plain Claude Code:
+
+> *how does checkout apply discounts?*
+> *make invoices round half-up*
+> *fix the login bug where expired tokens are accepted*
+
+Questions and code changes both work. Each message is routed to the zones that own the code, they do
+the work in parallel, and cross-module changes are checked before they are accepted. Close the chat, open
+a new one: the mode and the organisation are still there.
+
+| Optional | |
+|---|---|
+| `/codeceo:stop` | pause the mode; Claude works normally (nothing is deleted) |
+| `/codeceo:status` | org chart, stale zones, open messages |
+| `/codeceo:org` | reshape the organisation in plain language |
+| `/codeceo:ask` · `/codeceo:change` | force read-only or edit mode for one request |
 
 ## You are the CEO
 

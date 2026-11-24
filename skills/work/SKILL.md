@@ -1,6 +1,6 @@
 ---
 name: work
-description: Handle any question about, or change to, the code of a project that has CodeCEO active (a `.codeceo/` folder exists or the session briefing mentions CodeCEO). Routes the request to the zone agents that own the affected code, keeps each answer scoped to its zone, and coordinates multi-zone changes. Use instead of reading the repository yourself.
+description: Handle any question about, or change to, the code of a project where CodeCEO mode is on (a `.codeceo/` folder exists or the session briefing says so). Runs automatically for ordinary messages. Routes the request to the zone agents that own the affected code, keeps each answer scoped to its zone, and coordinates multi-zone changes. Use instead of reading the repository yourself.
 argument-hint: <question or change request>
 ---
 
@@ -12,13 +12,20 @@ between zones.
 
 Request: **$ARGUMENTS**
 
+(When CodeCEO mode is on, this skill runs for ordinary messages: the request is the user's latest message.
+Questions, change requests, bug fixes and refactors all come through here and are handled like plain Claude
+Code would, only scoped to the zones that own the code.)
+
 CLI (call it `ceo` below): `node "${CLAUDE_PLUGIN_ROOT}/bin/codeceo.mjs"`
 
 ## 0. Preconditions
 
-If `.codeceo/org.json` does not exist, stop and tell the user to run `/codeceo:init` first.
+If `.codeceo/org.json` does not exist, stop and tell the user to run `/codeceo:start` first.
 
 ## 1. Route
+
+If your context already contains a line starting with `Pre-computed route`, use it and skip this command.
+Otherwise run:
 
 ```
 ceo route "<the request, verbatim>"

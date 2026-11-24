@@ -7,6 +7,7 @@ export const DIR = '.codeceo';
 
 export const DEFAULT_CONFIG = {
   version: 1,
+  auto: true, // CodeCEO mode: route every ordinary message through the zone agents (`codeceo mode off` pauses it)
   include: [],
   exclude: [],
   maxFileBytes: 524288,

@@ -60,3 +60,24 @@ test('hook: projects without CodeCEO are left alone', () => {
   assert.equal(verdict(run('pre-tool-use', { cwd: root, agent_id: 'a', agent_type: 'codeceo:module-owner', tool_name: 'Edit', tool_input: { file_path: path.join(root, 'x.js') } })), 'allow');
   rm();
 });
+
+test('hook: in CodeCEO mode every ordinary message is routed with no command typed', async () => {
+  const { root, rm } = makeRepo();
+  await core.sync(root, { init: true });
+  const out = run('user-prompt', { cwd: root, prompt: 'fix the stripe payment invoice rounding' });
+  const ctx = out.hookSpecificOutput.additionalContext;
+  assert.match(ctx, /CodeCEO mode ON/);
+  assert.match(ctx, /codeceo:work/);
+  assert.match(ctx, /intent=change.*zones=\[src-billing\]/s, 'route precomputed by the hook');
+
+  assert.equal(run('user-prompt', { cwd: root, prompt: '/codeceo:status' }), null, 'slash commands untouched');
+
+  // pausing the mode makes the hook silent; the organisation stays
+  const cli = path.join(path.dirname(HOOK), '..', '..', 'bin', 'codeceo.mjs');
+  spawnSync(process.execPath, [cli, 'mode', 'off', '--root', root]);
+  assert.equal(run('user-prompt', { cwd: root, prompt: 'fix the stripe payment invoice rounding' }), null);
+  assert.match(run('session-start', { cwd: root }).hookSpecificOutput.additionalContext, /mode is OFF/);
+  spawnSync(process.execPath, [cli, 'mode', 'on', '--root', root]);
+  assert.ok(run('user-prompt', { cwd: root, prompt: 'explain the overall architecture please' }));
+  rm();
+});
