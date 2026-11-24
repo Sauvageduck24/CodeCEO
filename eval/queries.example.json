@@ -1,0 +1,7 @@
+[
+  { "q": "how does the checkout apply discounts to an order", "expectFiles": ["src/billing/discounts.ts"] },
+  { "q": "make invoice totals round half-up", "expectFiles": ["src/billing/invoice.ts"] },
+  { "q": "why does login reject tokens that are about to expire", "expectFiles": ["src/auth/session.ts"] },
+  { "q": "add a currency field to the product listing and show it in the cart", "expectFiles": ["src/catalog/products.ts", "src/cart/view.tsx"] },
+  { "q": "explain the overall architecture" }
+]

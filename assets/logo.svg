@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="CodeCEO">
+  <rect width="256" height="256" rx="58" fill="#4338ca"/>
+  <!-- handle -->
+  <path d="M98 96V80a16 16 0 0 1 16-16h28a16 16 0 0 1 16 16v16" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- case -->
+  <rect x="44" y="92" width="168" height="108" rx="18" fill="#fff"/>
+  <!-- fold line -->
+  <path d="M44 140h168" stroke="#4338ca" stroke-width="8" opacity=".9"/>
+  <!-- clasp -->
+  <rect x="113" y="128" width="30" height="26" rx="6" fill="#4338ca"/>
+  <circle cx="128" cy="141" r="4.5" fill="#fff"/>
+</svg>

@@ -1,0 +1,48 @@
+{
+  "name": "codeceo",
+  "version": "0.1.0",
+  "description": "A hierarchy of module-scoped agents with persistent context, for Claude Code and beyond.",
+  "type": "module",
+  "bin": {
+    "codeceo": "bin/codeceo.mjs"
+  },
+  "main": "core/index.mjs",
+  "exports": {
+    ".": "./core/index.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "files": [
+    "core",
+    "bin",
+    "adapters",
+    "agents",
+    "skills",
+    "hooks",
+    "providers",
+    ".claude-plugin",
+    "docs"
+  ],
+  "keywords": [
+    "claude-code",
+    "claude-code-plugin",
+    "multi-agent",
+    "context",
+    "rag",
+    "monorepo"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sauvageduck24/CodeCEO.git"
+  },
+  "homepage": "https://github.com/sauvageduck24/CodeCEO#readme",
+  "bugs": {
+    "url": "https://github.com/sauvageduck24/CodeCEO/issues"
+  },
+  "author": "sauvageduck24"
+}

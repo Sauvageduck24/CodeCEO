@@ -1,0 +1,23 @@
+{
+  "name": "codeceo",
+  "description": "CodeCEO: run your codebase like a company. One agent per module with persistent memory, routed by a CEO.",
+  "owner": {
+    "name": "sauvageduck24",
+    "url": "https://github.com/sauvageduck24"
+  },
+  "plugins": [
+    {
+      "name": "codeceo",
+      "source": "./",
+      "description": "A hierarchy of module-scoped agents with persistent context. Questions and changes are routed to the zone that owns the code.",
+      "category": "development",
+      "tags": [
+        "multi-agent",
+        "context",
+        "monorepo",
+        "architecture",
+        "subagents"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "codeceo",
+  "displayName": "CodeCEO",
+  "version": "0.1.0",
+  "description": "A hierarchy of module-scoped agents with persistent context. Each zone of your codebase gets its own agent, so questions and changes stay small, scoped and traceable.",
+  "author": {
+    "name": "sauvageduck24",
+    "url": "https://github.com/sauvageduck24"
+  },
+  "homepage": "https://github.com/sauvageduck24/CodeCEO",
+  "repository": "https://github.com/sauvageduck24/CodeCEO",
+  "license": "MIT",
+  "keywords": ["multi-agent", "context", "rag", "monorepo", "architecture", "subagents", "persistent-memory"]
+}

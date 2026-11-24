@@ -1,0 +1,132 @@
+<p align="center">
+  <img src="assets/logo.svg" width="112" alt="CodeCEO logo: a briefcase">
+</p>
+
+<h1 align="center">CodeCEO</h1>
+
+<p align="center">
+  <b>Run your codebase like a company.</b><br>
+  One agent per module. Each one remembers its zone. Nobody has to read the whole repo.
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-4338ca"></a>
+  <img alt="Claude Code plugin" src="https://img.shields.io/badge/Claude%20Code-plugin-4338ca">
+  <img alt="Zero dependencies" src="https://img.shields.io/badge/dependencies-0-4338ca">
+  <a href="https://github.com/sauvageduck24/CodeCEO/actions/workflows/test.yml"><img alt="tests" src="https://github.com/sauvageduck24/CodeCEO/actions/workflows/test.yml/badge.svg"></a>
+</p>
+
+---
+
+A single coding agent that has to understand your whole repository wastes context, forgets things between
+chats, and edits code it should not touch. **CodeCEO** gives every module of your project its own agent,
+with its own persistent memory, and puts a CEO on top that routes each request to the people who own it.
+
+- **Easy things stay easy.** A question about billing is answered by the *billing* agent, from billing's own
+  context. It never loads auth, the UI or the build system.
+- **Hard things become possible.** A change that crosses modules is split into waves, coordinated through
+  contracts, reviewed and integrated, with every decision traced.
+- **Nothing gets lost.** Each zone's knowledge lives in `.codeceo/contexts/*.md`. Close the chat, open
+  another one tomorrow, and the same organisation is back.
+
+## How it works
+
+```mermaid
+flowchart TD
+  You([You]) --> CEO["CEO · routes and integrates"]
+  CEO --> Auth["auth"]
+  CEO --> Billing["billing"]
+  CEO --> Catalog["catalog"]
+  Billing -. "public contract" .-> Auth
+  Auth --> OAuth["auth/oauth"]
+```
+
+1. **Scan.** CodeCEO reads your repo, builds the dependency graph, and derives one agent per module.
+   A small project is a single agent; zones only split when the code is too big for one head.
+2. **Remember.** Every agent writes down what its zone is for, why it is built that way, and what breaks
+   it. Facts (public API, dependencies, health) are regenerated automatically; notes are flagged stale when the
+   code underneath them changes.
+3. **Route.** Your request is matched to the zones that own the code. Those agents get a small brief
+   (their notes, their neighbours' contracts, the relevant snippets) and work in parallel.
+4. **Protect.** An agent can only edit files it owns. For anything else it sends a message to the owner.
+   Contract changes are diffed, dependents are notified, and the integration is checked before it is accepted.
+
+## Install
+
+```text
+/plugin marketplace add sauvageduck24/CodeCEO
+/plugin install codeceo@codeceo
+```
+
+Requires Node.js 18+ (no `npm install`, no dependencies).
+
+## Use
+
+Open any existing project and run:
+
+```text
+/codeceo:init                          adopt the project, write one context file per zone
+/codeceo:ask  how does checkout apply discounts?
+/codeceo:change  make invoices round half-up
+/codeceo:status                        org chart, stale zones, open messages
+/codeceo:org  billing may not talk to catalog directly
+```
+
+You can also just talk normally: once a project is initialised, Claude is told to route questions and
+changes through the zone agents instead of reading the repo itself.
+
+## You are the CEO
+
+The organisation follows your code, but your decisions override it. Use `/codeceo:org` to say in plain
+language who is responsible for what, who reports to whom, who may talk to whom, which zone to freeze,
+and which files belong elsewhere. It is all stored in `.codeceo/charter.json`.
+
+> More levels are not better. Every level is another handoff where information gets lost. CodeCEO adds
+> depth only where a zone is genuinely too large, and `/codeceo:org` will tell you when you ask for more
+> hierarchy than the code needs.
+
+## What lives in your repo
+
+```text
+.codeceo/
+├─ contexts/<zone>.md    what each agent knows: purpose, decisions, gotchas  (commit)
+├─ charter.json          your org decisions and who may talk to whom         (commit)
+├─ contracts.json        accepted public API of each zone                    (commit)
+├─ ledger.jsonl          decision and change trace                           (commit)
+├─ org.json  state.json  config.json  inbox/                                 (commit)
+└─ index/ routes.json …  derived data, rebuilt automatically                 (git-ignored)
+```
+
+Commit it and every teammate and every future chat starts from the same shared understanding.
+
+## Beyond Claude Code
+
+The core (`core/`) is plain Node with no model and no harness inside it. Claude Code is one thin adapter
+(`adapters/claude-code/`). Everything is also available as a CLI (`codeceo help`) and a JSON permission
+check (`codeceo guard`), so Codex, Pi or any other agent harness can plug in. See
+[docs/PORTING.md](docs/PORTING.md).
+
+## Honest status
+
+CodeCEO is young (v0.1). Import and API extraction is regex-based (JS/TS, Python, Go, Rust, Java, Kotlin,
+C/C++, Ruby, PHP), retrieval is lexical with an optional embeddings provider, and write scopes are enforced
+on the edit tools; shell commands are only caught afterwards by `integrate`. The token and quality gains are
+the hypothesis, not a result yet: [docs/EVALUATION.md](docs/EVALUATION.md) describes how to measure them
+against a conventional single-agent setup, and `codeceo bench` gives an offline estimate on your own repo.
+
+## Docs
+
+[Architecture](docs/ARCHITECTURE.md) · [Porting to other harnesses](docs/PORTING.md) · [Evaluation](docs/EVALUATION.md)
+
+## Star history
+
+<a href="https://star-history.com/#sauvageduck24/CodeCEO&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=sauvageduck24/CodeCEO&type=Date&theme=dark">
+    <img alt="Star history chart" src="https://api.star-history.com/svg?repos=sauvageduck24/CodeCEO&type=Date">
+  </picture>
+</a>
+
+## License
+
+[MIT](LICENSE)
