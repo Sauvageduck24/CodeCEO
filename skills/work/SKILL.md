@@ -2,6 +2,7 @@
 name: work
 description: Handle any question about, or change to, the code of a project where CodeCEO mode is on (a `.codeceo/` folder exists or the session briefing says so). Runs automatically for ordinary messages. Routes the request to the zone agents that own the affected code, keeps each answer scoped to its zone, and coordinates multi-zone changes. Use instead of reading the repository yourself.
 argument-hint: <question or change request>
+user-invocable: false
 ---
 
 # CodeCEO — work protocol

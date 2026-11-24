@@ -60,6 +60,24 @@ flowchart TD
 
 Requires Node.js 18+ (no `npm install`, no dependencies).
 
+### Update
+
+```bash
+claude plugin marketplace update codeceo
+claude plugin update codeceo@codeceo
+```
+
+Then restart Claude Code. Your `.codeceo/` folder is never touched by an update, so every zone context
+and org decision carries over. Check the installed version with `claude plugin list`.
+
+### Uninstall
+
+```bash
+claude plugin uninstall codeceo@codeceo
+```
+
+This removes the plugin only; delete `.codeceo/` too if you want the project back to how it was.
+
 ## Use
 
 ```text
