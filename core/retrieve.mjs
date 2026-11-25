@@ -53,8 +53,8 @@ export function chunkFile(file, maxLines = 60) {
 
 export function buildShard(agentId, files, cfg, vectors = null) {
   const docs = [];
-  const post = {};
-  const df = {};
+  const post = Object.create(null); // null prototype: tokens like "constructor" must not hit Object.prototype
+  const df = Object.create(null);
   let total = 0;
   for (const f of files) {
     const pathToks = tokenize(f.path);
@@ -80,7 +80,7 @@ export const loadShard = (root, id) => readJson(storePath(root, 'index', `${id}.
 export function bm25(shard, qTokens, { k1 = 1.2, b = 0.75 } = {}) {
   const scores = new Map();
   for (const q of new Set(qTokens)) {
-    const p = shard.post[q];
+    const p = Object.hasOwn(shard.post, q) ? shard.post[q] : null;
     if (!p) continue;
     const idf = Math.log(1 + (shard.n - shard.df[q] + 0.5) / (shard.df[q] + 0.5));
     for (const [d, tf] of p) {
@@ -151,9 +151,9 @@ export function buildRoutes(agentDocs) {
   // agentDocs: { id: { text, weightedText } }
   // pass 1: full term frequencies and document frequencies over agents
   const full = {};
-  const df = {};
+  const df = Object.create(null);
   for (const [id, d] of Object.entries(agentDocs)) {
-    const tf = {};
+    const tf = Object.create(null);
     for (const t of tokenize(d.text)) tf[t] = (tf[t] ?? 0) + 1;
     for (const t of tokenize(d.boost)) tf[t] = (tf[t] ?? 0) + 4;
     full[id] = tf;
@@ -162,7 +162,7 @@ export function buildRoutes(agentDocs) {
   // pass 2: keep the most DISCRIMINATIVE terms (tf·idf), not merely the most frequent ones
   const n = Object.keys(full).length;
   const agents = {};
-  const keptDf = {};
+  const keptDf = Object.create(null);
   for (const [id, tf] of Object.entries(full)) {
     const top = Object.entries(tf)
       .map(([t, f]) => [t, f, f * Math.log(1 + n / df[t])])
@@ -181,7 +181,7 @@ export function scoreAgents(routes, query) {
   for (const [id, a] of Object.entries(routes.agents)) {
     let s = 0;
     for (const t of q) {
-      const tf = a.tf[t];
+      const tf = Object.hasOwn(a.tf, t) ? a.tf[t] : 0;
       if (!tf) continue;
       const idf = Math.log(1 + (routes.n - routes.df[t] + 0.5) / (routes.df[t] + 0.5));
       // soft length normalisation (b = 0.3): a big module is not "less relevant" for being big

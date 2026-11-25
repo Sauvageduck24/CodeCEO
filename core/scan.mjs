@@ -35,7 +35,7 @@ export function listFiles(root, cfg) {
   let list = null;
   if (fs.existsSync(path.join(root, '.git'))) {
     try {
-      list = execFileSync('git', ['ls-files', '-co', '--exclude-standard', '-z'], { cwd: root, maxBuffer: 1 << 28, stdio: ['ignore', 'pipe', 'ignore'] })
+      list = execFileSync('git', ['ls-files', '-co', '--exclude-standard', '-z'], { cwd: root, maxBuffer: 1 << 28, stdio: ['ignore', 'pipe', 'ignore'], windowsHide: true })
         .toString('utf8')
         .split('\0')
         .filter(Boolean);
